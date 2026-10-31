@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Asset Manager</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <div id="app">
+    <aside id="sidebar">
+      <div class="app-title">Asset Manager</div>
+
+      <div class="sidebar-section">
+        <ul class="smart-views">
+          <li class="nav-item active" data-view="all" data-type="smart">
+            <span class="label">All Files</span>
+          </li>
+          <li class="nav-item" data-view="missing" data-type="smart">
+            <span class="label">Missing</span>
+            <span class="count" id="missing-count"></span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-header" id="tags-section-header">
+          <span>Tags <span class="chevron" id="tags-chevron">▾</span></span>
+        </div>
+        <ul class="tags-list" id="tags-sidebar-list"></ul>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-header">
+          <span>Watched Folders</span>
+          <button class="icon subtle" id="btn-add-root" title="Add folder">+</button>
+        </div>
+        <ul class="roots-list" id="roots-list"></ul>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-header">
+          <span>Collections</span>
+          <button class="icon subtle" id="btn-add-collection" title="New collection">+</button>
+        </div>
+        <ul class="collections-tree" id="collections-tree"></ul>
+      </div>
+    </aside>
+
+    <main id="main">
+      <div class="toolbar">
+        <input id="search" type="text" placeholder="Search filename, tags, notes…">
+        <div class="tag-filter" id="tag-filter"></div>
+        <div class="spacer"></div>
+        <button id="btn-import">Import Files…</button>
+        <button id="btn-rescan">Rescan All</button>
+      </div>
+      <div class="grid-scroll">
+        <div class="grid" id="grid"></div>
+        <div class="empty-state" id="empty-state" hidden>
+          <div class="big">No images here yet</div>
+          <div>Add a watched folder or import files to get started.</div>
+          <button class="primary" id="btn-empty-add-root">Add a Folder</button>
+        </div>
+      </div>
+    </main>
+
+    <aside id="inspector" hidden>
+      <button class="icon subtle" id="btn-close-inspector">×</button>
+      <div id="inspector-preview-wrap">
+        <img id="inspector-preview" alt="">
+      </div>
+      <div class="missing-banner" id="missing-banner" hidden>
+        This file couldn't be found at its last known location.
+      </div>
+      <h3 id="inspector-filename"></h3>
+      <div id="inspector-path"></div>
+      <div id="inspector-meta"></div>
+
+      <div class="inspector-section">
+        <label>Tags</label>
+        <div id="tags-editor"></div>
+      </div>
+
+      <div class="inspector-section">
+        <label>Collections</label>
+        <div id="collections-editor"></div>
+      </div>
+
+      <div class="inspector-section">
+        <label>Notes</label>
+        <textarea id="notes-editor" placeholder="Add a note…"></textarea>
+      </div>
+
+      <div class="inspector-actions">
+        <button id="btn-relink" hidden>Relink…</button>
+        <button class="danger" id="btn-remove">Remove from Library</button>
+      </div>
+    </aside>
+  </div>
+
+  <div id="drop-overlay" hidden>Drop images to import</div>
+  <div id="modal-root"></div>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
