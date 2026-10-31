@@ -15,7 +15,15 @@ else:
     # Running from source
     APP_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-DATA_DIR = os.path.join(APP_DIR, "library_data")
+if getattr(sys, "frozen", False) and sys.platform == "darwin":
+    # A macOS .app bundle isn't a safe place to write: replacing the app
+    # on update would wipe the library, and an unsigned app launched
+    # from Downloads runs from a read-only translocated copy.
+    DATA_DIR = os.path.join(
+        os.path.expanduser("~/Library/Application Support"), "AssetManager", "library_data"
+    )
+else:
+    DATA_DIR = os.path.join(APP_DIR, "library_data")
 INDEX_DIR = os.path.join(DATA_DIR, "index")
 THUMB_DIR = os.path.join(DATA_DIR, "thumbnails")
 

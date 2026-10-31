@@ -13,6 +13,7 @@ from flask import Flask, jsonify, request, send_file, render_template
 import webview
 
 from backend import config, library, collections as collections_backend
+from backend.version import display_version
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
 
@@ -21,7 +22,7 @@ app = Flask(__name__, static_folder="static", template_folder="templates")
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return render_template("index.html", version=display_version())
 
 
 # ---------------------------------------------------------------- roots
@@ -241,7 +242,7 @@ if __name__ == "__main__":
     flask_thread.start()
 
     window = webview.create_window(
-        "Asset Manager",
+        f"Asset Manager {display_version()}",
         "http://127.0.0.1:57433/",
         width=1400,
         height=900,
