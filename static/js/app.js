@@ -196,6 +196,82 @@ function confirmModal(message) {
   });
 }
 
+function addFolderModal(path) {
+  return new Promise((resolve) => {
+    const root = document.getElementById("modal-root");
+    const backdrop = document.createElement("div");
+    backdrop.className = "modal-backdrop";
+    backdrop.innerHTML = `
+      <div class="modal" style="width:420px;">
+        <h3>Add Folder</h3>
+        <div class="modal-path"></div>
+        <label class="collection-check">
+          <input type="checkbox" id="add-recursive" checked> Include subfolders
+        </label>
+        <div class="modal-actions">
+          <button id="modal-cancel">Cancel</button>
+          <button class="primary" id="modal-confirm">Add Folder</button>
+        </div>
+      </div>`;
+    backdrop.querySelector(".modal-path").textContent = path;
+    root.appendChild(backdrop);
+    function close(result) { root.removeChild(backdrop); resolve(result); }
+    backdrop.querySelector("#modal-cancel").onclick = () => close(null);
+    backdrop.querySelector("#modal-confirm").onclick = () =>
+      close({ recursive: backdrop.querySelector("#add-recursive").checked });
+    backdrop.querySelector("#modal-confirm").focus();
+  });
+}
+
+// ------------------------------------------------------------------ scan log
+
+// Scans run in the background on the server; this polls their status and
+// shows a small log in the corner so you can see a big folder working.
+let scanLogHideTimer = null;
+
+async function watchScan() {
+  const panel = document.getElementById("scan-log");
+  const linesEl = document.getElementById("scan-log-lines");
+  const progressEl = document.getElementById("scan-log-progress");
+  clearTimeout(scanLogHideTimer);
+  panel.hidden = false;
+  panel.classList.remove("done");
+
+  let status;
+  let lastRefresh = Date.now();
+  while (true) {
+    status = await api("/api/scan-status");
+    document.getElementById("scan-log-title").textContent =
+      status.running ? `Scanning ${status.label}…` : `Scanned ${status.label}`;
+    linesEl.textContent = status.lines.join("\n");
+    const p = status.progress;
+    progressEl.textContent = p ? `${p.done} / ${p.total}  ${p.current}` : "";
+    progressEl.hidden = !p;
+    linesEl.scrollTop = linesEl.scrollHeight;
+    if (!status.running) break;
+    // Pick up newly-saved files every few seconds without waiting for the end.
+    if (Date.now() - lastRefresh > 3000) { lastRefresh = Date.now(); loadRoots(); }
+    await new Promise((r) => setTimeout(r, 250));
+  }
+
+  panel.classList.add("done");
+  scanLogHideTimer = setTimeout(() => { panel.hidden = true; }, status.error ? 15000 : 5000);
+  return status;
+}
+
+// Starts a scan; onStarted runs once the server has accepted it (before
+// the scan finishes). Resolves to the final scan status, or null.
+async function startScan(path, options, onStarted) {
+  try {
+    await api(path, { method: "POST", ...options });
+  } catch (e) {
+    alert(e.message);
+    return null;
+  }
+  if (onStarted) await onStarted();
+  return watchScan();
+}
+
 // ------------------------------------------------------------------ loading data
 
 async function loadRoots() {
@@ -560,16 +636,25 @@ async function removeFileFromLibrary(fileId) {
 async function addRootFlow() {
   const { path } = await api("/api/pick-folder", { method: "POST" });
   if (!path) return;
-  await api("/api/roots", { method: "POST", body: JSON.stringify({ path }) });
+  const choice = await addFolderModal(path);
+  if (!choice) return;
+  const status = await startScan(
+    "/api/roots",
+    { body: JSON.stringify({ path, recursive: choice.recursive }) },
+    loadRoots,  // show the folder in the sidebar straight away
+  );
+  if (!status) return;
   await loadRoots();
   await loadTags();
   await loadFiles();
 }
 
 async function rescanRoot(rootId) {
-  const summary = await api(`/api/roots/${rootId}/rescan`, { method: "POST" });
+  const status = await startScan(`/api/roots/${rootId}/rescan`);
+  if (!status) return;
   await loadRoots();
   await loadFiles();
+  const summary = (status.summaries || [])[0] || {};
   if (summary.root_unreachable) {
     const root = state.roots.find((r) => r.id === rootId);
     alert(`Couldn't reach "${root ? root.label : "this folder"}" -- is the drive connected?\nNothing was marked missing.`);
@@ -577,10 +662,11 @@ async function rescanRoot(rootId) {
 }
 
 async function rescanAll() {
-  const summaries = await api("/api/roots/rescan-all", { method: "POST" });
+  const status = await startScan("/api/roots/rescan-all");
+  if (!status) return;
   await loadRoots();
   await loadFiles();
-  const unreachable = summaries
+  const unreachable = (status.summaries || [])
     .filter((s) => s.root_unreachable)
     .map((s) => (state.roots.find((r) => r.id === s.root_id) || {}).label || "?");
   if (unreachable.length) {
@@ -718,6 +804,9 @@ function setupStaticEventListeners() {
 async function boot() {
   setupStaticEventListeners();
   setupDragAndDrop();
+  document.getElementById("btn-close-scan-log").onclick = () => {
+    document.getElementById("scan-log").hidden = true;
+  };
   await Promise.all([loadRoots(), loadCollections(), loadTags()]);
   await loadFiles();
 }

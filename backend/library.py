@@ -62,7 +62,7 @@ def list_roots():
     return load_library().get("roots", [])
 
 
-def add_root(path, label=None):
+def add_root(path, label=None, recursive=True):
     path = os.path.normpath(path)
     lib = load_library()
     for r in lib["roots"]:
@@ -73,6 +73,7 @@ def add_root(path, label=None):
         "path": path,
         "label": label or os.path.basename(path.rstrip(os.sep)) or path,
         "added": _now_iso(),
+        "recursive": bool(recursive),
     }
     lib["roots"].append(root)
     save_library(lib)
@@ -131,14 +132,33 @@ def _save_imported(data):
 
 # ---------------------------------------------------------------- scanning
 
-def scan_root(root_id):
+def _find_images(root_path, recursive):
+    """Absolute paths of every supported image under root_path -- or
+    only directly inside it when recursive is False."""
+    found = []
+    for dirpath, dirnames, filenames in os.walk(root_path):
+        found.extend(
+            os.path.join(dirpath, f) for f in filenames if _is_supported_image(f)
+        )
+        if not recursive:
+            dirnames.clear()  # stop os.walk descending any further
+    return found
+
+
+def scan_root(root_id, progress=None):
     """Walk a watched root on disk, updating its index shard:
     - new supported image files get a fresh record + thumbnail
     - previously-known files that still exist get marked "ok"
     - previously-known files that no longer resolve get marked "missing"
       (their record, tags, and notes are kept, never deleted)
-    Returns a summary dict.
+    Only the root folder itself is scanned if the root was added with
+    recursive=False (roots added before that option existed are recursive).
+
+    progress, if given, is called as progress(message) for milestones
+    and progress(None, done=i, total=n, current=name) per file, so the
+    UI can show a live scan log. Returns a summary dict.
     """
+    report = progress or (lambda *a, **k: None)
     root = get_root(root_id)
     if root is None:
         raise ValueError(f"Unknown root: {root_id}")
@@ -150,6 +170,7 @@ def scan_root(root_id):
         # without touching any file's status, otherwise every file under
         # this root would get wrongly flagged "missing" on every scan
         # until the drive is plugged back in.
+        report(f"Can't reach {root['path']} -- skipped, nothing marked missing")
         return {
             "root_id": root_id,
             "added": 0,
@@ -158,43 +179,46 @@ def scan_root(root_id):
             "root_unreachable": True,
         }
 
+    recursive = root.get("recursive", True)
+    report(f"Scanning {root['path']}" + ("" if recursive else " (top folder only)"))
+    image_paths = _find_images(root["path"], recursive)
+    total = len(image_paths)
+    report(f"Found {total} image{'' if total == 1 else 's'}")
+
     shard = _load_shard(root_id)
     files = shard.setdefault("files", {})
     seen_relpaths = set()
     added, updated, missing = 0, 0, 0
 
-    for dirpath, _dirnames, filenames in os.walk(root["path"]):
-        for filename in filenames:
-            if not _is_supported_image(filename):
-                continue
-            abs_path = os.path.join(dirpath, filename)
-            rel_path = os.path.relpath(abs_path, root["path"])
-            seen_relpaths.add(rel_path)
+    for i, abs_path in enumerate(image_paths, start=1):
+        rel_path = os.path.relpath(abs_path, root["path"])
+        seen_relpaths.add(rel_path)
+        report(None, done=i, total=total, current=rel_path)
 
-            record = files.get(rel_path)
-            try:
-                stat = os.stat(abs_path)
-            except OSError:
-                continue
+        record = files.get(rel_path)
+        try:
+            stat = os.stat(abs_path)
+        except OSError:
+            continue
 
-            if record is None:
-                record = _new_record()
-                files[rel_path] = record
-                added += 1
-            elif record.get("status") == "missing":
-                updated += 1
+        if record is None:
+            record = _new_record()
+            files[rel_path] = record
+            added += 1
+        elif record.get("status") == "missing":
+            updated += 1
 
-            record["status"] = "ok"
-            record["size_bytes"] = stat.st_size
-            record["mtime"] = stat.st_mtime
+        record["status"] = "ok"
+        record["size_bytes"] = stat.st_size
+        record["mtime"] = stat.st_mtime
 
-            thumb_file = thumbnail_path(record["id"])
-            if not os.path.exists(thumb_file) or record.get("_mtime_at_thumb") != stat.st_mtime:
-                dims = generate_thumbnail(abs_path, thumb_file)
-                if dims:
-                    record["width"], record["height"] = dims
-                record["_mtime_at_thumb"] = stat.st_mtime
-                record["thumbnail"] = os.path.basename(thumb_file)
+        thumb_file = thumbnail_path(record["id"])
+        if not os.path.exists(thumb_file) or record.get("_mtime_at_thumb") != stat.st_mtime:
+            dims = generate_thumbnail(abs_path, thumb_file)
+            if dims:
+                record["width"], record["height"] = dims
+            record["_mtime_at_thumb"] = stat.st_mtime
+            record["thumbnail"] = os.path.basename(thumb_file)
 
     # anything we know about but didn't see on disk this pass -> missing
     for rel_path, record in files.items():
@@ -212,8 +236,8 @@ def scan_root(root_id):
     }
 
 
-def scan_all_roots():
-    return [scan_root(r["id"]) for r in list_roots()] + [scan_imported()]
+def scan_all_roots(progress=None):
+    return [scan_root(r["id"], progress) for r in list_roots()] + [scan_imported(progress)]
 
 
 def _location_reachable(abs_path):
@@ -225,17 +249,22 @@ def _location_reachable(abs_path):
     return os.path.isdir(anchor)
 
 
-def scan_imported():
+def scan_imported(progress=None):
     """Re-check every drag-and-dropped / imported file, same rules as
     scan_root(): found -> "ok" (thumbnail refreshed if the file changed),
     not found -> "missing" (record, tags and notes kept). Files whose
     whole drive or share is unreachable are left untouched, so an
     unplugged drive doesn't flag everything on it as missing."""
+    report = progress or (lambda *a, **k: None)
     imported = _load_imported()
     files = imported.setdefault("files", {})
     updated, missing, unreachable = 0, 0, 0
+    total = len(files)
+    if total:
+        report(f"Checking {total} imported file{'' if total == 1 else 's'}")
 
-    for abs_path, record in files.items():
+    for i, (abs_path, record) in enumerate(files.items(), start=1):
+        report(None, done=i, total=total, current=os.path.basename(abs_path))
         if not _location_reachable(abs_path):
             unreachable += 1
             continue

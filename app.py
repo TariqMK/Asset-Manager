@@ -12,7 +12,7 @@ from flask import Flask, jsonify, request, send_file, render_template
 
 import webview
 
-from backend import config, library, collections as collections_backend
+from backend import config, library, scan_jobs, collections as collections_backend
 from backend.version import display_version
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
@@ -41,23 +41,46 @@ def add_root():
     path = payload.get("path")
     if not path or not os.path.isdir(path):
         return jsonify({"error": "Not a valid folder path"}), 400
-    root = library.add_root(path, label=payload.get("label"))
-    summary = library.scan_root(root["id"])
-    return jsonify({"root": root, "scan": summary})
+    if scan_jobs.status()["running"]:
+        return jsonify({"error": "A scan is already running -- try again when it finishes"}), 409
+    root = library.add_root(
+        path, label=payload.get("label"), recursive=payload.get("recursive", True)
+    )
+    job_id = _start_scan(root["label"], lambda progress: library.scan_root(root["id"], progress))
+    return jsonify({"root": root, "job_id": job_id})
 
 
 @app.route("/api/roots/<root_id>/rescan", methods=["POST"])
 def rescan_root(root_id):
-    try:
-        summary = library.scan_root(root_id)
-    except ValueError as e:
-        return jsonify({"error": str(e)}), 404
-    return jsonify(summary)
+    root = library.get_root(root_id)
+    if root is None:
+        return jsonify({"error": f"Unknown root: {root_id}"}), 404
+    job_id = _start_scan(root["label"], lambda progress: library.scan_root(root_id, progress))
+    if job_id is None:
+        return jsonify({"error": "A scan is already running"}), 409
+    return jsonify({"job_id": job_id})
 
 
 @app.route("/api/roots/rescan-all", methods=["POST"])
 def rescan_all():
-    return jsonify(library.scan_all_roots())
+    job_id = _start_scan("all folders", library.scan_all_roots)
+    if job_id is None:
+        return jsonify({"error": "A scan is already running"}), 409
+    return jsonify({"job_id": job_id})
+
+
+@app.route("/api/scan-status", methods=["GET"])
+def scan_status():
+    return jsonify(scan_jobs.status())
+
+
+def _start_scan(label, fn):
+    """Starts a background scan; returns its job id, or None if another
+    scan is still running."""
+    try:
+        return scan_jobs.start(label, fn)
+    except scan_jobs.ScanBusy:
+        return None
 
 
 @app.route("/api/roots/<root_id>", methods=["DELETE"])

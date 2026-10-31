@@ -469,6 +469,52 @@ textarea { resize: vertical; font-family: inherit; }
   pointer-events: none;
 }
 
+/* ---------------------------------------------------------- scan log */
+
+#scan-log {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  width: 380px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  padding: 8px 10px 10px;
+  z-index: 900;
+  font-size: 11.5px;
+  color: var(--text-dim);
+}
+#scan-log.done .scan-log-header { color: var(--text-dim); }
+.scan-log-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--text);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+#scan-log-lines {
+  margin: 0;
+  max-height: 120px;
+  overflow-y: auto;
+  font-family: Consolas, "SF Mono", Menlo, monospace;
+  font-size: 11px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-all;
+  user-select: text;
+}
+#scan-log-progress {
+  margin-top: 4px;
+  font-family: Consolas, "SF Mono", Menlo, monospace;
+  font-size: 11px;
+  color: var(--accent);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* ---------------------------------------------------------- modal */
 
 .modal-backdrop {
@@ -488,6 +534,12 @@ textarea { resize: vertical; font-family: inherit; }
   gap: 12px;
 }
 .modal h3 { margin: 0; font-size: 14px; }
+.modal .modal-path {
+  font-size: 12px;
+  color: var(--text-dim);
+  word-break: break-all;
+  user-select: text;
+}
 .modal .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px; }
 
 ::-webkit-scrollbar { width: 10px; height: 10px; }
