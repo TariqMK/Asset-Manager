@@ -80,3 +80,20 @@ try:
 finally:
     with open(VERSION_FILE, "w", encoding="utf-8", newline="") as f:
         f.write(original)
+
+# Unzipping a download with Windows' built-in extractor marks every file as
+# "from the internet", and .NET Framework then refuses to load pythonnet's
+# Python.Runtime.dll ("Failed to resolve Python.Runtime.Loader.Initialize"),
+# so the window never opens. This config next to the exe lets the process
+# load its own bundled DLLs anyway.
+NETFX_CONFIG = """<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <runtime>
+    <loadFromRemoteSources enabled="true"/>
+  </runtime>
+</configuration>
+"""
+
+if sys.platform == "win32":
+    with open(os.path.join("dist", "AssetManager", "AssetManager.exe.config"), "w", encoding="utf-8") as f:
+        f.write(NETFX_CONFIG)
