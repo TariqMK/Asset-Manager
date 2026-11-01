@@ -6,6 +6,7 @@ Run with:  python app.py
 Packaged into a .exe with PyInstaller -- see build.py.
 """
 import os
+import sys
 import threading
 
 from flask import Flask, jsonify, request, send_file, render_template
@@ -260,7 +261,26 @@ def run_flask():
     app.run(host="127.0.0.1", port=57433, debug=False, use_reloader=False)
 
 
+def unblock_bundled_files():
+    """Unzipping a download with Windows' built-in extractor marks every
+    file as "from the internet" (a Zone.Identifier stream), and .NET
+    Framework then refuses to load pythonnet's Python.Runtime.dll
+    ("Failed to resolve Python.Runtime.Loader.Initialize"), so the window
+    never opens. Clear that mark from the app's own bundled files before
+    pywebview loads .NET. Best-effort: a read-only install just skips it."""
+    if not (getattr(sys, "frozen", False) and sys.platform == "win32"):
+        return
+    for dirpath, _, filenames in os.walk(sys._MEIPASS):
+        for name in filenames:
+            try:
+                os.remove(os.path.join(dirpath, name) + ":Zone.Identifier")
+            except OSError:
+                pass
+
+
 if __name__ == "__main__":
+    unblock_bundled_files()
+
     flask_thread = threading.Thread(target=run_flask, daemon=True)
     flask_thread.start()
 
