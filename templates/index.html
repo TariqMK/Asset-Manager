@@ -7,107 +7,140 @@
 </head>
 <body>
   <div id="app">
-    <aside id="sidebar">
-      <div class="app-title">Asset Manager <span class="app-version">{{ version }}</span></div>
+    <aside id="sidebar" aria-label="Library">
+      <div class="brand">
+        <span class="brand-name">Asset Manager</span>
+        <span class="brand-version">{{ version }}</span>
+      </div>
 
-      <div class="sidebar-section">
-        <ul class="smart-views">
+      <nav class="sidebar-section">
+        <ul class="nav-list">
           <li class="nav-item active" data-view="all" data-type="smart">
-            <span class="label">All Files</span>
+            <button class="nav-row" type="button">
+              <i data-icon="images"></i>
+              <span class="label">All files</span>
+            </button>
           </li>
           <li class="nav-item" data-view="missing" data-type="smart">
-            <span class="label">Missing</span>
-            <span class="count" id="missing-count"></span>
+            <button class="nav-row" type="button">
+              <i data-icon="image-off"></i>
+              <span class="label">Missing</span>
+              <span class="count" id="missing-count"></span>
+            </button>
           </li>
         </ul>
-      </div>
+      </nav>
 
-      <div class="sidebar-section">
-        <div class="sidebar-header" id="tags-section-header">
-          <span>Tags <span class="chevron" id="tags-chevron">▾</span></span>
-        </div>
-        <ul class="tags-list" id="tags-sidebar-list"></ul>
-      </div>
-
-      <div class="sidebar-section">
+      <section class="sidebar-section">
         <div class="sidebar-header">
-          <span>Watched Folders</span>
-          <button class="icon subtle" id="btn-add-root" title="Add folder">+</button>
+          <button class="section-toggle" id="tags-section-header" type="button" aria-expanded="true">
+            <span>Tags</span>
+            <i data-icon="chevron-down" id="tags-chevron"></i>
+          </button>
         </div>
-        <ul class="roots-list" id="roots-list"></ul>
-      </div>
+        <ul class="nav-list tags-list" id="tags-sidebar-list"></ul>
+      </section>
 
-      <div class="sidebar-section">
+      <section class="sidebar-section">
         <div class="sidebar-header">
-          <span>Collections</span>
-          <button class="icon subtle" id="btn-add-collection" title="New collection">+</button>
+          <span class="section-title">Watched folders</span>
+          <button class="icon subtle" id="btn-add-root" type="button" title="Add folder" aria-label="Add folder"><i data-icon="plus"></i></button>
         </div>
-        <ul class="collections-tree" id="collections-tree"></ul>
-      </div>
+        <ul class="nav-list" id="roots-list"></ul>
+      </section>
+
+      <section class="sidebar-section">
+        <div class="sidebar-header">
+          <span class="section-title">Collections</span>
+          <button class="icon subtle" id="btn-add-collection" type="button" title="New collection" aria-label="New collection"><i data-icon="plus"></i></button>
+        </div>
+        <ul class="nav-list collections-tree" id="collections-tree"></ul>
+      </section>
     </aside>
 
     <main id="main">
-      <div class="toolbar">
-        <input id="search" type="text" placeholder="Search filename, tags, notes…">
-        <div class="tag-filter" id="tag-filter"></div>
+      <header class="toolbar">
+        <div class="view-heading">
+          <h1 id="view-title">All files</h1>
+          <span class="view-count" id="view-count"></span>
+          <span class="tag-filter" id="tag-filter"></span>
+        </div>
         <div class="spacer"></div>
-        <button id="btn-import">Import Files…</button>
-        <button id="btn-rescan">Rescan All</button>
-      </div>
+        <label class="search-field">
+          <i data-icon="search"></i>
+          <input id="search" type="search" placeholder="Search" aria-label="Search filenames, tags and notes">
+        </label>
+        <button id="btn-import" type="button" title="Import files"><i data-icon="image-plus"></i><span class="btn-label">Import files</span></button>
+        <button id="btn-rescan" type="button" title="Rescan all folders"><i data-icon="refresh"></i><span class="btn-label">Rescan all</span></button>
+      </header>
       <div class="grid-scroll">
         <div class="grid" id="grid"></div>
         <div class="empty-state" id="empty-state" hidden>
-          <div class="big">No images here yet</div>
-          <div>Add a watched folder or import files to get started.</div>
-          <button class="primary" id="btn-empty-add-root">Add a Folder</button>
+          <i data-icon="images" class="empty-icon"></i>
+          <div class="empty-title" id="empty-title">No images here yet</div>
+          <div class="empty-text" id="empty-text">Add a folder you already use, or import individual files. Nothing on disk is moved or changed.</div>
+          <div class="empty-actions" id="empty-actions">
+            <button class="primary" id="btn-empty-add-root" type="button"><i data-icon="folder-plus"></i>Add a folder</button>
+          </div>
         </div>
       </div>
     </main>
 
-    <aside id="inspector" hidden>
-      <button class="icon subtle" id="btn-close-inspector">×</button>
+    <aside id="inspector" hidden aria-label="File details">
+      <div class="inspector-head">
+        <h2 id="inspector-filename"></h2>
+        <button class="icon subtle" id="btn-close-inspector" type="button" title="Close" aria-label="Close details"><i data-icon="x"></i></button>
+      </div>
       <div id="inspector-preview-wrap">
         <img id="inspector-preview" alt="">
       </div>
       <div class="missing-banner" id="missing-banner" hidden>
-        This file couldn't be found at its last known location.
+        <i data-icon="alert"></i>
+        <span>This file isn't at its last known location. Its tags and notes are kept.</span>
       </div>
-      <h3 id="inspector-filename"></h3>
+      <div id="inspector-meta" class="catalogue"></div>
       <div id="inspector-path"></div>
-      <div id="inspector-meta"></div>
 
       <div class="inspector-section">
-        <label>Tags</label>
+        <div class="field-label">Tags</div>
         <div id="tags-editor"></div>
       </div>
 
       <div class="inspector-section">
-        <label>Collections</label>
+        <div class="field-label">Collections</div>
         <div id="collections-editor"></div>
       </div>
 
       <div class="inspector-section">
-        <label>Notes</label>
-        <textarea id="notes-editor" placeholder="Add a note…"></textarea>
+        <label class="field-label" for="notes-editor">Notes</label>
+        <textarea id="notes-editor" placeholder="Add a note"></textarea>
       </div>
 
       <div class="inspector-actions">
-        <button id="btn-relink" hidden>Relink…</button>
-        <button class="danger" id="btn-remove">Remove from Library</button>
+        <button id="btn-relink" type="button" hidden><i data-icon="link"></i>Relink…</button>
+        <button class="danger" id="btn-remove" type="button"><i data-icon="trash"></i>Remove from library</button>
       </div>
     </aside>
   </div>
 
-  <div id="scan-log" hidden>
+  <div id="scan-log" hidden role="status">
     <div class="scan-log-header">
       <span id="scan-log-title"></span>
-      <button class="icon subtle" id="btn-close-scan-log" title="Hide">×</button>
+      <button class="icon subtle" id="btn-close-scan-log" type="button" title="Hide" aria-label="Hide scan log"><i data-icon="x"></i></button>
     </div>
-    <pre id="scan-log-lines"></pre>
+    <div class="scan-log-bar" id="scan-log-bar" hidden><span id="scan-log-bar-fill"></span></div>
     <div id="scan-log-progress" hidden></div>
+    <pre id="scan-log-lines"></pre>
   </div>
 
-  <div id="drop-overlay" hidden>Drop images to import</div>
+  <div id="toast-root" aria-live="polite"></div>
+
+  <div id="drop-overlay" hidden>
+    <div class="drop-target">
+      <i data-icon="image-plus"></i>
+      <span>Drop images to import</span>
+    </div>
+  </div>
   <div id="modal-root"></div>
 
   <script src="/static/js/app.js"></script>

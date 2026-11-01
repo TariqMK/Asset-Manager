@@ -26,6 +26,62 @@ async function api(path, options = {}) {
   return contentType.includes("application/json") ? res.json() : null;
 }
 
+// ------------------------------------------------------------------ icons
+// Lucide icons (lucide.dev, ISC licence), inlined so the app works offline.
+
+const ICONS = {
+  images: '<path d="M18 22H4a2 2 0 0 1-2-2V6"/><path d="m22 13-1.296-1.296a2.41 2.41 0 0 0-3.408 0L11 18"/><circle cx="12" cy="8" r="2"/><rect width="16" height="16" x="6" y="2" rx="2"/>',
+  image: '<rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>',
+  "image-off": '<line x1="2" x2="22" y1="2" y2="22"/><path d="M10.41 10.41a2 2 0 1 1-2.83-2.83"/><line x1="13.5" x2="6" y1="13.5" y2="21"/><line x1="18" x2="21" y1="12" y2="15"/><path d="M3.59 3.59A1.99 1.99 0 0 0 3 5v14a2 2 0 0 0 2 2h14c.55 0 1.052-.22 1.41-.59"/><path d="M21 15V5a2 2 0 0 0-2-2H9"/>',
+  "image-plus": '<path d="M16 5h6"/><path d="M19 2v6"/><path d="M21 11.5V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7.5"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/><circle cx="9" cy="9" r="2"/>',
+  tag: '<path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/>',
+  folder: '<path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/>',
+  "folder-plus": '<path d="M12 10v6"/><path d="M9 13h6"/><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/>',
+  layers: '<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>',
+  filter: '<polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>',
+  plus: '<path d="M5 12h14"/><path d="M12 5v14"/>',
+  x: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+  refresh: '<path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/>',
+  pencil: '<path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/>',
+  search: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+  "chevron-down": '<path d="m6 9 6 6 6-6"/>',
+  link: '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
+  trash: '<path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>',
+  alert: '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+  info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
+};
+
+function icon(name, extraClass = "") {
+  return `<svg class="i ${extraClass}" viewBox="0 0 24 24" aria-hidden="true">${ICONS[name] || ""}</svg>`;
+}
+
+// Static markup uses <i data-icon="name"> placeholders; swap them for SVGs.
+function hydrateIcons(scope = document) {
+  scope.querySelectorAll("i[data-icon]").forEach((el) => {
+    const tmp = document.createElement("span");
+    tmp.innerHTML = icon(el.dataset.icon, el.className);
+    const svg = tmp.firstElementChild;
+    if (el.id) svg.id = el.id;
+    el.replaceWith(svg);
+  });
+}
+
+function esc(s) {
+  return String(s ?? "").replace(/[&<>"']/g, (c) => (
+    { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]
+  ));
+}
+
+// In-app feedback instead of alert() dialogs.
+function toast(message, { error = false, duration = 6000 } = {}) {
+  const el = document.createElement("div");
+  el.className = "toast" + (error ? " error" : "");
+  el.innerHTML = `${icon(error ? "alert" : "info")}<span></span>`;
+  el.querySelector("span").textContent = message;
+  document.getElementById("toast-root").appendChild(el);
+  setTimeout(() => el.remove(), duration);
+}
+
 // ------------------------------------------------------------------ modal helper
 
 function normalizeTagFilterForEdit(tagFilter) {
@@ -42,47 +98,62 @@ function normalizeTagFilterForEdit(tagFilter) {
   return { combine: "and", rules: [{ tags: new Set(tagFilter.tags || []), match: tagFilter.match || "any" }] };
 }
 
+// Mounts a modal; Escape cancels, Enter (outside textareas/rule inputs) confirms.
+function mountModal(innerHtml, { onCancel, onConfirm }) {
+  const root = document.getElementById("modal-root");
+  const backdrop = document.createElement("div");
+  backdrop.className = "modal-backdrop";
+  backdrop.innerHTML = innerHtml;
+  hydrateIcons(backdrop);
+  root.appendChild(backdrop);
+  backdrop.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") { e.preventDefault(); onCancel(); }
+    if (e.key === "Enter" && !e.target.closest("textarea, .rule-tag-add, button")) {
+      e.preventDefault();
+      onConfirm();
+    }
+  });
+  backdrop.addEventListener("mousedown", (e) => { if (e.target === backdrop) onCancel(); });
+  return backdrop;
+}
+
 function showCollectionModal(existingNode = null) {
   return new Promise((resolve) => {
-    const root = document.getElementById("modal-root");
-    const backdrop = document.createElement("div");
-    backdrop.className = "modal-backdrop";
     const isEdit = !!existingNode;
     const initialType = existingNode ? existingNode.type : "manual";
     const initial = normalizeTagFilterForEdit(existingNode ? existingNode.tag_filter : null);
     const rules = initial.rules; // array of {tags: Set, match: "any"|"all"}, mutated in place
 
-    backdrop.innerHTML = `
-      <div class="modal" style="width:400px;max-height:82vh;overflow-y:auto;">
-        <h3>${isEdit ? "Edit Collection" : "New Collection"}</h3>
-        <div>
-          <label class="modal-label">Name</label>
-          <input id="col-name" type="text" style="width:100%" value="${existingNode ? existingNode.name : ""}" placeholder="e.g. Inspiration">
+    const backdrop = mountModal(`
+      <div class="modal" role="dialog" aria-modal="true">
+        <h3>${isEdit ? "Edit collection" : "New collection"}</h3>
+        <div class="modal-field">
+          <label class="modal-label" for="col-name">Name</label>
+          <input id="col-name" type="text" value="${esc(existingNode ? existingNode.name : "")}" placeholder="Inspiration">
         </div>
-        <div>
-          <label class="modal-label">Type</label>
-          <select id="col-type" style="width:100%">
-            <option value="manual">Manual — add files yourself</option>
-            <option value="smart">Smart — auto-include by tag rules</option>
+        <div class="modal-field">
+          <label class="modal-label" for="col-type">Type</label>
+          <select id="col-type">
+            <option value="manual">Manual: add files yourself</option>
+            <option value="smart">Smart: include files by tag rules</option>
           </select>
         </div>
         <div id="smart-fields" hidden>
-          <div id="combine-wrap" style="display:none;">
-            <label class="modal-label">Combine rules with</label>
-            <select id="col-combine" style="width:100%">
-              <option value="and">AND — file must match every rule</option>
-              <option value="or">OR — file must match at least one rule</option>
+          <div id="combine-wrap" class="modal-field" style="display:none;">
+            <label class="modal-label" for="col-combine">Combine rules with</label>
+            <select id="col-combine">
+              <option value="and">And: a file must match every rule</option>
+              <option value="or">Or: a file must match at least one rule</option>
             </select>
           </div>
           <div id="rules-container"></div>
-          <button id="btn-add-rule" class="subtle" type="button" style="margin-top:8px;width:100%;">+ Add another rule</button>
+          <button id="btn-add-rule" type="button"><i data-icon="plus"></i>Add another rule</button>
         </div>
         <div class="modal-actions">
-          <button id="modal-cancel">Cancel</button>
-          <button class="primary" id="modal-confirm">${isEdit ? "Save" : "Create"}</button>
+          <button id="modal-cancel" type="button">Cancel</button>
+          <button class="primary" id="modal-confirm" type="button">${isEdit ? "Save" : "Create"}</button>
         </div>
-      </div>`;
-    root.appendChild(backdrop);
+      </div>`, { onCancel: () => close(null), onConfirm: () => confirm() });
 
     const typeSelect = backdrop.querySelector("#col-type");
     typeSelect.value = initialType;
@@ -101,7 +172,7 @@ function showCollectionModal(existingNode = null) {
         block.innerHTML = `
           <div class="rule-header">
             <span>Rule ${idx + 1}</span>
-            ${rules.length > 1 ? '<button type="button" class="icon subtle btn-remove-rule">×</button>' : ""}
+            ${rules.length > 1 ? `<button type="button" class="icon subtle btn-remove-rule" title="Remove rule" aria-label="Remove rule">${icon("x")}</button>` : ""}
           </div>
           <label class="modal-label">Match</label>
           <select class="rule-match" style="width:100%">
@@ -110,7 +181,7 @@ function showCollectionModal(existingNode = null) {
           </select>
           <label class="modal-label">Tags</label>
           <div class="tag-checklist rule-tag-checklist"></div>
-          <input type="text" class="rule-tag-add" placeholder="Add a tag and press Enter…" style="width:100%;margin-top:6px;">
+          <input type="text" class="rule-tag-add" placeholder="New tag, then Enter">
         `;
         block.querySelector(".rule-match").value = rule.match;
         block.querySelector(".rule-match").onchange = (e) => { rule.match = e.target.value; };
@@ -121,12 +192,12 @@ function showCollectionModal(existingNode = null) {
           const allTagNames = new Set(state.tags.map((t) => t.name));
           rule.tags.forEach((t) => allTagNames.add(t));
           if (allTagNames.size === 0) {
-            listEl.innerHTML = `<div style="font-size:12px;color:var(--text-dim);">No tags yet — add one below.</div>`;
+            listEl.innerHTML = `<div class="muted-note">No tags yet. Add one below</div>`;
           }
           Array.from(allTagNames).sort().forEach((name) => {
             const row = document.createElement("label");
             row.className = "collection-check";
-            row.innerHTML = `<input type="checkbox" ${rule.tags.has(name) ? "checked" : ""}> ${name}`;
+            row.innerHTML = `<input type="checkbox" ${rule.tags.has(name) ? "checked" : ""}><span>${esc(name)}</span>`;
             row.querySelector("input").onchange = (e) => {
               if (e.target.checked) rule.tags.add(name);
               else rule.tags.delete(name);
@@ -159,11 +230,12 @@ function showCollectionModal(existingNode = null) {
     };
     backdrop.querySelector("#col-name").focus();
 
-    function close(result) { root.removeChild(backdrop); resolve(result); }
+    function close(result) { backdrop.remove(); resolve(result); }
     backdrop.querySelector("#modal-cancel").onclick = () => close(null);
-    backdrop.querySelector("#modal-confirm").onclick = () => {
+    backdrop.querySelector("#modal-confirm").onclick = () => confirm();
+    function confirm() {
       const name = backdrop.querySelector("#col-name").value.trim();
-      if (!name) return;
+      if (!name) { backdrop.querySelector("#col-name").focus(); return; }
       const type = typeSelect.value;
       const result = { name, type };
       if (type === "smart") {
@@ -173,52 +245,52 @@ function showCollectionModal(existingNode = null) {
         result.tag_filter = { rules: cleanRules, combine: backdrop.querySelector("#col-combine").value };
       }
       close(result);
-    };
+    }
   });
 }
 
-function confirmModal(message) {
+// title: the question; detail: what happens to the user's files; action: the
+// destructive verb on the confirm button (never a bare "OK").
+function confirmModal({ title, detail, action }) {
   return new Promise((resolve) => {
-    const root = document.getElementById("modal-root");
-    const backdrop = document.createElement("div");
-    backdrop.className = "modal-backdrop";
-    backdrop.innerHTML = `
-      <div class="modal">
-        <h3>${message}</h3>
+    const backdrop = mountModal(`
+      <div class="modal" role="alertdialog" aria-modal="true">
+        <h3></h3>
+        <div class="modal-text"></div>
         <div class="modal-actions">
-          <button id="modal-cancel">Cancel</button>
-          <button class="danger" id="modal-confirm">Confirm</button>
+          <button id="modal-cancel" type="button">Cancel</button>
+          <button class="danger" id="modal-confirm" type="button"></button>
         </div>
-      </div>`;
-    root.appendChild(backdrop);
-    backdrop.querySelector("#modal-cancel").onclick = () => { root.removeChild(backdrop); resolve(false); };
-    backdrop.querySelector("#modal-confirm").onclick = () => { root.removeChild(backdrop); resolve(true); };
+      </div>`, { onCancel: () => close(false), onConfirm: () => close(true) });
+    backdrop.querySelector("h3").textContent = title;
+    backdrop.querySelector(".modal-text").textContent = detail;
+    backdrop.querySelector("#modal-confirm").textContent = action;
+    function close(result) { backdrop.remove(); resolve(result); }
+    backdrop.querySelector("#modal-cancel").onclick = () => close(false);
+    backdrop.querySelector("#modal-confirm").onclick = () => close(true);
+    backdrop.querySelector("#modal-cancel").focus();
   });
 }
 
 function addFolderModal(path) {
   return new Promise((resolve) => {
-    const root = document.getElementById("modal-root");
-    const backdrop = document.createElement("div");
-    backdrop.className = "modal-backdrop";
-    backdrop.innerHTML = `
-      <div class="modal" style="width:420px;">
-        <h3>Add Folder</h3>
+    const backdrop = mountModal(`
+      <div class="modal" role="dialog" aria-modal="true" style="width:440px;">
+        <h3>Add folder</h3>
         <div class="modal-path"></div>
         <label class="collection-check">
-          <input type="checkbox" id="add-recursive" checked> Include subfolders
+          <input type="checkbox" id="add-recursive" checked><span>Include subfolders</span>
         </label>
         <div class="modal-actions">
-          <button id="modal-cancel">Cancel</button>
-          <button class="primary" id="modal-confirm">Add Folder</button>
+          <button id="modal-cancel" type="button">Cancel</button>
+          <button class="primary" id="modal-confirm" type="button">Add folder</button>
         </div>
-      </div>`;
+      </div>`, { onCancel: () => close(null), onConfirm: () => confirm() });
     backdrop.querySelector(".modal-path").textContent = path;
-    root.appendChild(backdrop);
-    function close(result) { root.removeChild(backdrop); resolve(result); }
+    function close(result) { backdrop.remove(); resolve(result); }
+    function confirm() { close({ recursive: backdrop.querySelector("#add-recursive").checked }); }
     backdrop.querySelector("#modal-cancel").onclick = () => close(null);
-    backdrop.querySelector("#modal-confirm").onclick = () =>
-      close({ recursive: backdrop.querySelector("#add-recursive").checked });
+    backdrop.querySelector("#modal-confirm").onclick = confirm;
     backdrop.querySelector("#modal-confirm").focus();
   });
 }
@@ -245,8 +317,13 @@ async function watchScan() {
       status.running ? `Scanning ${status.label}…` : `Scanned ${status.label}`;
     linesEl.textContent = status.lines.join("\n");
     const p = status.progress;
-    progressEl.textContent = p ? `${p.done} / ${p.total}  ${p.current}` : "";
+    progressEl.textContent = p ? `${p.done.toLocaleString()} of ${p.total.toLocaleString()}  ${p.current}` : "";
     progressEl.hidden = !p;
+    document.getElementById("scan-log-bar").hidden = !p;
+    if (p) {
+      document.getElementById("scan-log-bar-fill").style.transform =
+        `scaleX(${p.total ? p.done / p.total : 0})`;
+    }
     linesEl.scrollTop = linesEl.scrollHeight;
     if (!status.running) break;
     // Pick up newly-saved files every few seconds without waiting for the end.
@@ -265,7 +342,7 @@ async function startScan(path, options, onStarted) {
   try {
     await api(path, { method: "POST", ...options });
   } catch (e) {
-    alert(e.message);
+    toast(e.message, { error: true });
     return null;
   }
   if (onStarted) await onStarted();
@@ -311,28 +388,33 @@ async function updateMissingCount() {
 
 // ------------------------------------------------------------------ sidebar rendering
 
-function navItem({ label, count, active, onClick, extraButtons, icon, badge, title }) {
+function navItem({ label, count, active, onClick, extraButtons, iconName, badge, title, className }) {
   const li = document.createElement("li");
-  li.className = "nav-item" + (active ? " active" : "");
-  li.innerHTML = `<span class="label"></span><span class="nav-badge"></span><span class="count"></span><span class="row-actions"></span>`;
-  li.querySelector(".label").textContent = (icon ? icon + " " : "") + label;
+  li.className = "nav-item" + (active ? " active" : "") + (className ? " " + className : "");
+  li.innerHTML = `
+    <button class="nav-row" type="button">
+      ${iconName ? icon(iconName) : ""}
+      <span class="label"></span><span class="nav-badge"></span><span class="count"></span>
+    </button>`;
+  li.querySelector(".label").textContent = label;
   if (count !== undefined) li.querySelector(".count").textContent = count;
   if (badge) li.querySelector(".nav-badge").textContent = badge;
-  if (title) li.title = title;
-  li.addEventListener("click", (e) => {
-    if (e.target.closest(".row-actions")) return;
-    onClick();
-  });
+  if (title) li.querySelector(".nav-row").title = title;
+  li.querySelector(".nav-row").addEventListener("click", onClick);
   if (extraButtons) {
-    const actions = li.querySelector(".row-actions");
+    const actions = document.createElement("span");
+    actions.className = "row-actions";
     extraButtons.forEach((btn) => {
       const b = document.createElement("button");
-      b.className = "icon";
-      b.textContent = btn.icon;
+      b.type = "button";
+      b.className = "icon subtle";
+      b.innerHTML = icon(btn.icon);
       b.title = btn.title;
+      b.setAttribute("aria-label", btn.title);
       b.onclick = (e) => { e.stopPropagation(); btn.onClick(); };
       actions.appendChild(b);
     });
+    li.appendChild(actions);
   }
   return li;
 }
@@ -353,15 +435,17 @@ function renderSidebar() {
     rootsList.appendChild(
       navItem({
         label: root.label,
-        badge: root.reachable === false ? "disconnected" : undefined,
+        iconName: "folder",
+        badge: root.reachable === false ? "offline" : undefined,
+        className: root.reachable === false ? "offline" : "",
         title: root.reachable === false
           ? `${root.path}\nCan't reach this folder right now (unplugged drive or offline share?). Its files keep their tags and won't be marked missing.`
           : root.path,
         active: state.view.type === "root" && state.view.id === root.id,
         onClick: () => setView({ type: "root", id: root.id }),
         extraButtons: [
-          { icon: "⟳", title: "Rescan", onClick: () => rescanRoot(root.id) },
-          { icon: "×", title: "Stop watching", onClick: () => removeRoot(root.id) },
+          { icon: "refresh", title: "Rescan", onClick: () => rescanRoot(root.id) },
+          { icon: "x", title: "Stop watching", onClick: () => removeRoot(root.id) },
         ],
       })
     );
@@ -376,36 +460,42 @@ function renderSidebar() {
         label: node.name,
         count: node.file_count || undefined,
         active: state.view.type === "collection" && state.view.id === node.id,
-        icon: node.type === "smart" ? "⚡" : undefined,
+        iconName: node.type === "smart" ? "filter" : "layers",
+        title: node.type === "smart" ? "Smart collection: files are included by tag rules" : undefined,
         onClick: () => setView({ type: "collection", id: node.id }),
         extraButtons: [
-          { icon: "+", title: "New sub-collection", onClick: () => addCollection(node.id) },
-          { icon: "✎", title: node.type === "smart" ? "Edit rule" : "Rename", onClick: () => renameCollection(node) },
-          { icon: "×", title: "Delete", onClick: () => deleteCollection(node) },
+          { icon: "plus", title: "New sub-collection", onClick: () => addCollection(node.id) },
+          { icon: "pencil", title: node.type === "smart" ? "Edit rules" : "Rename", onClick: () => renameCollection(node) },
+          { icon: "x", title: "Delete", onClick: () => deleteCollection(node) },
         ],
       });
       container.appendChild(li);
       if (node.children && node.children.length) {
         const childUl = document.createElement("ul");
-        childUl.className = "collection-children";
+        childUl.className = "nav-list";
         li.appendChild(childUl);
         renderNodes(node.children, childUl);
       }
     });
   }
   renderNodes(state.collections, tree);
+  renderViewHeader();
 }
 
+// Tags are picked from the sidebar; the toolbar shows the active one as a
+// removable filter next to the view title.
 function renderTagFilter() {
   const el = document.getElementById("tag-filter");
   el.innerHTML = "";
-  state.tags.slice(0, 12).forEach((tag) => {
-    const chip = document.createElement("span");
-    chip.className = "tag-chip" + (state.activeTag === tag.name ? " active" : "");
-    chip.textContent = tag.name;
-    chip.onclick = () => toggleActiveTag(tag.name);
-    el.appendChild(chip);
-  });
+  if (!state.activeTag) return;
+  const chip = document.createElement("button");
+  chip.type = "button";
+  chip.className = "filter-chip";
+  chip.title = "Clear tag filter";
+  chip.innerHTML = `<span></span>${icon("x")}`;
+  chip.querySelector("span").textContent = state.activeTag;
+  chip.onclick = () => toggleActiveTag(state.activeTag);
+  el.appendChild(chip);
 }
 
 let tagsSidebarCollapsed = false;
@@ -414,13 +504,14 @@ function renderTagsSidebar() {
   const el = document.getElementById("tags-sidebar-list");
   el.innerHTML = "";
   if (state.tags.length === 0) {
-    el.innerHTML = `<li style="padding:6px 8px;font-size:12px;color:var(--text-dim);">No tags yet</li>`;
+    el.innerHTML = `<li class="sidebar-empty">No tags yet</li>`;
     return;
   }
   state.tags.forEach((tag) => {
     el.appendChild(
       navItem({
         label: tag.name,
+        iconName: "tag",
         count: tag.count,
         active: state.activeTag === tag.name,
         onClick: () => toggleActiveTag(tag.name),
@@ -453,35 +544,89 @@ function extOf(filename) {
   return parts.length > 1 ? parts.pop().toLowerCase() : "";
 }
 
+// The signature catalogue line, like the label on a slide mount:
+// "JPG · 1600×1000", plus the file size in the inspector.
+function catalogueLine(file, withSize = false) {
+  const bits = [extOf(file.filename).toUpperCase() || "FILE"];
+  if (file.width && file.height) bits.push(`${file.width}×${file.height}`);
+  if (withSize && file.size_bytes) bits.push(formatBytes(file.size_bytes));
+  return bits.join(" · ");
+}
+
+function currentViewTitle() {
+  const { type, id } = state.view;
+  if (type === "smart") return id === "missing" ? "Missing" : "All files";
+  if (type === "root") return (state.roots.find((r) => r.id === id) || {}).label || "Folder";
+  const node = flattenCollections(state.collections).find((c) => c.id === id);
+  return node ? node.name : "Collection";
+}
+
+function renderViewHeader() {
+  document.getElementById("view-title").textContent = currentViewTitle();
+  const n = state.files.length;
+  document.getElementById("view-count").textContent = `${n.toLocaleString()} ${n === 1 ? "file" : "files"}`;
+}
+
+function renderEmptyState() {
+  const title = document.getElementById("empty-title");
+  const text = document.getElementById("empty-text");
+  const actions = document.getElementById("empty-actions");
+  const libraryEmpty = state.roots.length === 0 && state.view.type === "smart" && state.view.id === "all"
+    && !state.search && !state.activeTag;
+  actions.hidden = !libraryEmpty;
+  if (libraryEmpty) {
+    title.textContent = "No images here yet";
+    text.textContent = "Add a folder you already use, or import individual files. Nothing on disk is moved or changed.";
+  } else if (state.search || state.activeTag) {
+    title.textContent = "No matches";
+    text.textContent = "Nothing in this view matches the current search or tag filter.";
+  } else if (state.view.type === "smart" && state.view.id === "missing") {
+    title.textContent = "Nothing missing";
+    text.textContent = "Every file is where the library last saw it.";
+  } else {
+    title.textContent = "Nothing in this view";
+    text.textContent = state.view.type === "collection"
+      ? "Add files to this collection from the details panel."
+      : "This folder has no supported images yet. Rescan it to pick up new files.";
+  }
+}
+
 function renderGrid() {
   const grid = document.getElementById("grid");
   const emptyState = document.getElementById("empty-state");
   grid.innerHTML = "";
+  renderViewHeader();
 
   if (state.files.length === 0) {
+    renderEmptyState();
     emptyState.hidden = false;
     return;
   }
   emptyState.hidden = true;
 
   state.files.forEach((file) => {
-    const card = document.createElement("div");
-    card.className = "thumb-card" + (file.id === state.selectedFileId ? " selected" : "");
-    card.dataset.id = file.id;
-
+    const card = document.createElement("button");
+    card.type = "button";
     const isMissing = file.status === "missing";
+    card.className = "thumb-card"
+      + (file.id === state.selectedFileId ? " selected" : "")
+      + (isMissing ? " missing" : "");
+    card.dataset.id = file.id;
+    card.title = file.filename;
+
     const hasThumb = file.thumbnail && IMAGE_EXTENSIONS.has(extOf(file.filename));
 
     card.innerHTML = `
       <div class="thumb-image-wrap">
         ${hasThumb
           ? `<img src="/api/thumbnails/${file.id}.png" loading="lazy" alt="">`
-          : `<span class="placeholder-icon">▨</span>`}
+          : icon("image", "placeholder-icon")}
+        ${isMissing ? `<span class="thumb-missing-badge">${icon("alert")}Missing</span>` : ""}
       </div>
-      ${isMissing ? `<span class="thumb-missing-badge">Missing</span>` : ""}
       <div class="thumb-meta">
-        <div class="thumb-filename" title="${file.filename}">${file.filename}</div>
-        <div class="thumb-tags">${file.tags.slice(0, 3).map((t) => `<span class="mini-tag">${t}</span>`).join("")}</div>
+        <div class="thumb-filename">${esc(file.filename)}</div>
+        <div class="catalogue">${esc(catalogueLine(file))}</div>
+        <div class="thumb-tags">${esc(file.tags.join(", "))}</div>
       </div>`;
 
     card.addEventListener("click", () => selectFile(file.id));
@@ -499,7 +644,7 @@ function closeInspector() {
 
 async function selectFile(fileId) {
   state.selectedFileId = fileId;
-  renderGrid();
+  document.querySelectorAll(".thumb-card").forEach((c) => c.classList.toggle("selected", c.dataset.id === fileId));
   await renderInspector();
 }
 
@@ -511,17 +656,17 @@ async function renderInspector() {
   inspector.hidden = false;
 
   const hasThumb = file.thumbnail && IMAGE_EXTENSIONS.has(extOf(file.filename));
-  document.getElementById("inspector-preview").src = hasThumb ? `/api/thumbnails/${file.id}.png` : "";
+  const preview = document.getElementById("inspector-preview");
+  if (hasThumb) preview.src = `/api/thumbnails/${file.id}.png`;
+  else preview.removeAttribute("src");
   document.getElementById("missing-banner").hidden = file.status !== "missing";
   document.getElementById("btn-relink").hidden = file.status !== "missing";
-  document.getElementById("inspector-filename").textContent = file.filename;
+  const filenameEl = document.getElementById("inspector-filename");
+  filenameEl.textContent = file.filename;
+  filenameEl.title = file.filename;
   document.getElementById("inspector-path").textContent = file.path;
-
-  const metaBits = [];
-  if (file.width && file.height) metaBits.push(`${file.width}×${file.height}`);
-  if (file.size_bytes) metaBits.push(formatBytes(file.size_bytes));
-  metaBits.push(file.root_label);
-  document.getElementById("inspector-meta").textContent = metaBits.join(" · ");
+  document.getElementById("inspector-meta").textContent =
+    [catalogueLine(file, true), file.root_label].filter(Boolean).join(" · ");
 
   renderTagsEditor(file);
   renderCollectionsEditor(file);
@@ -540,7 +685,7 @@ function renderTagsEditor(file) {
   file.tags.forEach((tag) => {
     const chip = document.createElement("span");
     chip.className = "editable-tag";
-    chip.innerHTML = `${tag} <button title="Remove">×</button>`;
+    chip.innerHTML = `<span>${esc(tag)}</span><button type="button" title="Remove tag" aria-label="Remove tag ${esc(tag)}">${icon("x")}</button>`;
     chip.querySelector("button").onclick = () => {
       const newTags = file.tags.filter((t) => t !== tag);
       saveFileField(file.id, { tags: newTags }, () => {
@@ -555,7 +700,8 @@ function renderTagsEditor(file) {
   });
   const input = document.createElement("input");
   input.id = "tag-input";
-  input.placeholder = "Add tag…";
+  input.placeholder = file.tags.length ? "Add tag" : "Add a tag, then Enter";
+  input.setAttribute("aria-label", "Add tag");
   input.onkeydown = (e) => {
     if (e.key === "Enter" && input.value.trim()) {
       const newTags = [...file.tags, input.value.trim()];
@@ -581,7 +727,7 @@ async function renderCollectionsEditor(file) {
   const el = document.getElementById("collections-editor");
   const flat = flattenCollections(state.collections);
   if (flat.length === 0) {
-    el.innerHTML = `<div style="font-size:12px;color:var(--text-dim);">No collections yet.</div>`;
+    el.innerHTML = `<div class="muted-note">No collections yet</div>`;
     return;
   }
   const memberOf = new Set(await api(`/api/files/${file.id}/collections`));
@@ -589,9 +735,10 @@ async function renderCollectionsEditor(file) {
   for (const col of flat) {
     const isSmart = col.type === "smart";
     const row = document.createElement("label");
-    row.className = "collection-check";
+    row.className = "collection-check" + (isSmart ? " auto" : "");
     const checked = memberOf.has(col.id);
-    row.innerHTML = `<input type="checkbox" ${checked ? "checked" : ""} ${isSmart ? "disabled" : ""}> ${col.name}${isSmart ? '<span class="smart-badge">auto</span>' : ""}`;
+    row.innerHTML = `<input type="checkbox" ${checked ? "checked" : ""} ${isSmart ? "disabled" : ""}><span>${esc(col.name)}</span>${isSmart ? '<span class="smart-badge">by tags</span>' : ""}`;
+    if (isSmart) row.title = "Smart collection: membership follows its tag rules";
     if (!isSmart) {
       row.querySelector("input").onchange = async (e) => {
         if (e.target.checked) {
@@ -622,7 +769,11 @@ async function relinkFile(fileId) {
 }
 
 async function removeFileFromLibrary(fileId) {
-  const ok = await confirmModal("Remove this file from the library? Your file on disk is not affected.");
+  const ok = await confirmModal({
+    title: "Remove this file from the library?",
+    detail: "Its tags and notes are forgotten. The file on disk is not touched.",
+    action: "Remove",
+  });
   if (!ok) return;
   await api(`/api/files/${fileId}`, { method: "DELETE" });
   closeInspector();
@@ -657,7 +808,7 @@ async function rescanRoot(rootId) {
   const summary = (status.summaries || [])[0] || {};
   if (summary.root_unreachable) {
     const root = state.roots.find((r) => r.id === rootId);
-    alert(`Couldn't reach "${root ? root.label : "this folder"}" -- is the drive connected?\nNothing was marked missing.`);
+    toast(`Couldn't reach "${root ? root.label : "this folder"}". Check the drive is connected.\nNothing was marked missing.`, { error: true });
   }
 }
 
@@ -670,12 +821,16 @@ async function rescanAll() {
     .filter((s) => s.root_unreachable)
     .map((s) => (state.roots.find((r) => r.id === s.root_id) || {}).label || "?");
   if (unreachable.length) {
-    alert(`Couldn't reach: ${unreachable.join(", ")} -- is the drive connected?\nFiles in those folders were not marked missing.`);
+    toast(`Couldn't reach ${unreachable.join(", ")}. Check the drive is connected.\nFiles in those folders were not marked missing.`, { error: true });
   }
 }
 
 async function removeRoot(rootId) {
-  const ok = await confirmModal("Stop watching this folder? Your files are not affected, but this app will forget their tags.");
+  const ok = await confirmModal({
+    title: "Stop watching this folder?",
+    detail: "The library forgets the tags and notes on its files. The files on disk are not touched.",
+    action: "Stop watching",
+  });
   if (!ok) return;
   await api(`/api/roots/${rootId}`, { method: "DELETE" });
   if (state.view.type === "root" && state.view.id === rootId) setView({ type: "smart", id: "all" });
@@ -713,7 +868,11 @@ async function renameCollection(node) {
 }
 
 async function deleteCollection(node) {
-  const ok = await confirmModal(`Delete "${node.name}" and its sub-collections? Files stay in your library.`);
+  const ok = await confirmModal({
+    title: `Delete "${node.name}"?`,
+    detail: "Its sub-collections are deleted too. The files stay in your library.",
+    action: "Delete",
+  });
   if (!ok) return;
   await api(`/api/collections/${node.id}`, { method: "DELETE" });
   if (state.view.type === "collection" && state.view.id === node.id) setView({ type: "smart", id: "all" });
@@ -755,7 +914,7 @@ function setupDragAndDrop() {
       if (file.path) paths.push(file.path);
     }
     if (paths.length === 0) {
-      alert("Couldn't read file paths from the drop. Try \"Import Files…\" instead.");
+      toast("Couldn't read file paths from the drop. Use Import files instead.", { error: true });
       return;
     }
     await api("/api/import", { method: "POST", body: JSON.stringify({ paths }) });
@@ -786,11 +945,16 @@ function setupStaticEventListeners() {
   document.getElementById("btn-add-root").onclick = addRootFlow;
   document.getElementById("btn-empty-add-root").onclick = addRootFlow;
   document.getElementById("btn-add-collection").onclick = () => addCollection(null);
-  document.getElementById("tags-section-header").onclick = () => {
+  document.getElementById("tags-section-header").onclick = (e) => {
     tagsSidebarCollapsed = !tagsSidebarCollapsed;
     document.getElementById("tags-sidebar-list").hidden = tagsSidebarCollapsed;
-    document.getElementById("tags-chevron").textContent = tagsSidebarCollapsed ? "▸" : "▾";
+    e.currentTarget.setAttribute("aria-expanded", String(!tagsSidebarCollapsed));
   };
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !document.querySelector(".modal-backdrop") && state.selectedFileId) {
+      closeInspector();
+    }
+  });
   document.getElementById("btn-import").onclick = importFilesFlow;
   document.getElementById("btn-rescan").onclick = rescanAll;
   document.getElementById("btn-close-inspector").onclick = closeInspector;
@@ -802,6 +966,7 @@ function setupStaticEventListeners() {
 }
 
 async function boot() {
+  hydrateIcons();
   setupStaticEventListeners();
   setupDragAndDrop();
   document.getElementById("btn-close-scan-log").onclick = () => {
