@@ -4,6 +4,7 @@ Writes (1280 x 800 px window, saved at 2x):
   assets/screenshots/library-dark.png             All files, with one image open in the details panel
   assets/screenshots/smart-collections-dark.png   A smart collection built from tag rules
   assets/screenshots/missing-files-dark.png       The Missing view, with a file ready to relink
+  docs/img/*.jpg                                  The same sample images, 480 px, for the site's live previews
 
 How it works: it draws sample images into a temporary folder, builds a
 library there with the app's own backend, serves the real Flask app and
@@ -300,6 +301,17 @@ def build_library(sample_dir: Path):
     return {"selected": ids[SELECTED], "missing": ids[MISSING], "golden": golden["id"]}
 
 
+def export_site_images():
+    """Small copies of every sample image for the GitHub Pages site (docs/)."""
+    site_dir = REPO / "docs" / "img"
+    site_dir.mkdir(parents=True, exist_ok=True)
+    for rel, make, _tags, _order in SAMPLES:
+        image = make().convert("RGB")
+        image.thumbnail((480, 480), Image.LANCZOS)
+        image.save(site_dir / f"{Path(rel).stem}.jpg", quality=82, optimize=True, progressive=True)
+    print(f"Wrote {len(SAMPLES)} images to {site_dir.relative_to(REPO)}")
+
+
 def serve(sample_dir: Path):
     """Serve the real Flask app, with the temporary folder shown as FAKE_PARENT."""
     from werkzeug.serving import make_server
@@ -395,6 +407,7 @@ def main():
             os.makedirs(d, exist_ok=True)
         version.__version__ = VERSION
 
+        export_site_images()
         ids = build_library(sample_dir)
         server = serve(sample_dir)
         markers = [str(temp), os.environ.get("USERNAME", ""), os.environ.get("USER", ""),

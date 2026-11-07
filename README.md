@@ -199,11 +199,11 @@ pip install -r requirements.txt PySide6
 python assets/make_screenshots.py
 ```
 
-The script stops without saving if a section of the details panel is squeezed, or if your user name, computer name or a real path shows on the page.
+The script stops without saving if a section of the details panel is squeezed, or if your user name, computer name or a real path shows on the page. It also writes the sample images used by the website to `docs/img/`.
 
 ### Update the icon, banner and social card
 
-All brand images come from the icon masters in `assets/icon/`. To rebuild the `.png`, `.ico` and `.icns` icons, `assets/banner.png` and `assets/social-card.png`, run this on Windows. It needs PySide6 and Pillow, installed in the step above:
+All brand images come from the icon masters in `assets/icon/`. To rebuild the `.png`, `.ico` and `.icns` icons, `assets/banner.png`, `assets/social-card.png` and the website's copies in `docs/`, run this on Windows. It needs PySide6 and Pillow, installed in the step above:
 
 ```bash
 python assets/make_assets.py

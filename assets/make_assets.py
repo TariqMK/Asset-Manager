@@ -6,6 +6,8 @@ Writes:
   assets/icon/asset-manager.icns   16 to 1024 px, with @2x sizes (macOS)
   assets/banner.png                README banner, 1280 x 320 px drawn at 2x
   assets/social-card.png           GitHub social preview, 1280 x 640 px
+  docs/icon.svg, docs/apple-touch-icon.png (180 px), docs/social-card.png
+                                   copies for the GitHub Pages site
 
 The 16, 24 and 32 px sizes come from asset-manager-small.svg. All other sizes
 come from asset-manager.svg. Colours match static/css/style.css.
@@ -224,11 +226,25 @@ def check_safe_area(image: QImage) -> None:
     print(f"Social card safe area check passed (content x {x0}-{x1}, y {y0}-{y1})")
 
 
+def copy_to_site() -> None:
+    """Pages serves only docs/, so the site gets its own copies."""
+    docs = ASSETS.parent / "docs"
+    docs.mkdir(exist_ok=True)
+    (docs / "icon.svg").write_bytes(MASTER.read_bytes())
+    (docs / "social-card.png").write_bytes((ASSETS / "social-card.png").read_bytes())
+    # iOS rounds the corners itself and shows transparency as black, so fill them.
+    touch = Image.new("RGBA", (180, 180), BG_DEEP)
+    touch.alpha_composite(render_svg(MASTER, 180))
+    touch.convert("RGB").save(docs / "apple-touch-icon.png")
+    print("Wrote docs/icon.svg, docs/social-card.png, docs/apple-touch-icon.png")
+
+
 def main() -> None:
     app = QGuiApplication(sys.argv[:1])  # noqa: F841 - Qt needs an application object.
     make_icons()
     make_banner()
     check_safe_area(make_social_card())
+    copy_to_site()
 
 
 if __name__ == "__main__":

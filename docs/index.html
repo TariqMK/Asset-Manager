@@ -1,0 +1,203 @@
+<!-- Asset Manager product page, served by GitHub Pages from docs/. -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Asset Manager · Tag, sort and find images. Files untouched.</title>
+  <meta name="description" content="A free desktop app for Windows, macOS and Linux that adds tags, notes and collections to the image folders you already use, without moving, renaming or changing a file.">
+  <meta name="theme-color" content="#0f0f10">
+  <meta name="color-scheme" content="dark">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Asset Manager">
+  <meta property="og:description" content="Tag, sort and find images. Files untouched.">
+  <meta property="og:url" content="https://tariqmk.github.io/Asset-Manager/">
+  <meta property="og:image" content="https://tariqmk.github.io/Asset-Manager/social-card.png">
+  <meta property="og:image:width" content="1280">
+  <meta property="og:image:height" content="640">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Asset Manager">
+  <meta name="twitter:description" content="Tag, sort and find images. Files untouched.">
+  <meta name="twitter:image" content="https://tariqmk.github.io/Asset-Manager/social-card.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="nav">
+    <div class="nav-inner">
+      <a class="nav-brand" href="#top"><img src="icon.svg" alt="" width="28" height="28">Asset Manager</a>
+      <nav class="nav-links" aria-label="Page">
+        <a href="#features">Features</a>
+        <a href="#download">Download</a>
+        <a href="https://github.com/TariqMK/Asset-Manager">GitHub</a>
+      </nav>
+      <a class="btn btn-small" href="https://github.com/TariqMK/Asset-Manager/releases/latest" data-download>Download</a>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <svg class="motif" viewBox="0 0 1024 1024" aria-hidden="true">
+        <rect x="212" y="212" width="280" height="280" rx="40"/>
+        <rect x="532" y="212" width="280" height="280" rx="40"/>
+        <rect x="212" y="532" width="280" height="280" rx="40"/>
+        <rect x="532" y="532" width="280" height="280" rx="40"/>
+        <path transform="rotate(-20 512 512)" d="M400 300 h170 l120 120 v260 a36 36 0 0 1 -36 36 h-254 a36 36 0 0 1 -36 -36 v-344 a36 36 0 0 1 36 -36z"/>
+        <circle transform="rotate(-20 512 512)" cx="560" cy="400" r="34"/>
+      </svg>
+      <div class="hero-text">
+        <h1>Tag, sort and find images.<br>Files untouched.</h1>
+        <p class="lede">Asset Manager builds a searchable library on top of the image folders you already use. Tags, notes and collections live in the app's own data folder, so your files are never moved, renamed or changed.</p>
+        <div class="actions">
+          <a class="btn btn-primary" href="https://github.com/TariqMK/Asset-Manager/releases/latest" id="hero-download" data-download>Download</a>
+          <a class="btn btn-ghost" href="https://github.com/TariqMK/Asset-Manager">View source</a>
+        </div>
+        <p class="meta" id="hero-meta">Free · Windows · macOS · Linux · Offline, no tracking</p>
+      </div>
+
+      <div class="window" aria-label="Preview of the Asset Manager window" role="img">
+        <div class="titlebar"><span>Asset Manager v1.2.2</span><span class="controls"><i></i><i></i><i></i></span></div>
+        <div class="app">
+          <aside class="app-sidebar" id="hero-sidebar"></aside>
+          <div class="app-main">
+            <div class="app-toolbar">
+              <div class="app-heading"><b>All files</b><span class="cat" id="hero-count">17 files</span></div>
+              <div class="app-search"><svg class="ico"><use href="#i-search"/></svg>Search</div>
+            </div>
+            <div class="app-grid" id="hero-grid"></div>
+          </div>
+          <aside class="app-inspector" id="hero-inspector"></aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="principles" aria-label="Principles">
+      <div class="principle">
+        <h3>Your files stay as they are.</h3>
+        <p>Nothing is moved, renamed, edited or deleted. Removing an image from the library removes only the app's record of it.</p>
+      </div>
+      <div class="principle">
+        <h3>Stays on your computer.</h3>
+        <p>Works offline. No account, no telemetry, nothing sent anywhere. Your library is plain JSON in one folder you can copy to back it up.</p>
+      </div>
+      <div class="principle">
+        <h3>Ready for drives that come and go.</h3>
+        <p>An unplugged drive shows as offline instead of flagging every file. A moved file keeps its tags and notes until you relink it.</p>
+      </div>
+    </section>
+
+    <section class="features" id="features">
+      <h2>Find any image again,<br>wherever it lives.</h2>
+
+      <div class="panels">
+        <article class="panel panel-wide">
+          <div class="panel-text">
+            <h3>Smart collections</h3>
+            <p>Describe a collection with tag rules, such as <em>any</em> or <em>all</em> of some tags, combined by <em>and</em> or <em>or</em>. Matching images join and leave on their own as you tag.</p>
+            <p class="cat" id="smart-meta">2 rules · 5 files</p>
+          </div>
+          <div class="smart">
+            <div class="rules" id="smart-rules"></div>
+            <div class="mini-grid smart-grid" id="smart-grid"></div>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-text">
+            <h3>Tags, notes and search</h3>
+            <p>Click a tag to filter the library. Search covers file names, tags and note text.</p>
+          </div>
+          <div class="filter-demo">
+            <div class="filter-bar">
+              <div class="app-search" id="filter-search"><svg class="ico"><use href="#i-search"/></svg><span id="filter-query"></span><span class="caret"></span></div>
+              <span class="chip" id="filter-chip" hidden></span>
+              <span class="cat" id="filter-count">16 files</span>
+            </div>
+            <div class="filter-body">
+              <ul class="filter-tags" id="filter-tags"></ul>
+              <div class="mini-grid filter-grid" id="filter-grid"></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-text">
+            <h3>Background scans</h3>
+            <p>Add a folder, or a whole drive, and keep working. The scan runs in the background with live progress.</p>
+          </div>
+          <div class="scan-demo">
+            <div class="scan-log">
+              <div class="scan-title" id="scan-title">Scanning Design Library…</div>
+              <div class="scan-bar"><span id="scan-fill"></span></div>
+              <div class="cat scan-progress" id="scan-progress"></div>
+              <pre class="cat scan-lines" id="scan-lines"></pre>
+            </div>
+            <div class="mini-grid scan-grid" id="scan-grid"></div>
+          </div>
+        </article>
+      </div>
+
+      <div class="feature-grid">
+        <div><h4>Watched folders</h4><p>Any folder on a local disk, an external drive or a network share, with or without subfolders.</p></div>
+        <div><h4>Drag and drop</h4><p>Drop images onto the window to add files that live outside your watched folders.</p></div>
+        <div><h4>Tags and notes</h4><p>Tag any image and add free-form notes. Every tag shows its file count.</p></div>
+        <div><h4>Nested collections</h4><p>Group images by project, in any folder structure you like. One image can be in many collections.</p></div>
+        <div><h4>Smart collections</h4><p>Collections built from tag rules that update themselves.</p></div>
+        <div><h4>Search</h4><p>Find images by file name, tag or note text.</p></div>
+        <div><h4>Missing files</h4><p>Moved files are listed under Missing, with their tags kept. Relink them in one step.</p></div>
+        <div><h4>Offline drives</h4><p>A folder that can't be reached is marked offline. Its files are not flagged as missing.</p></div>
+        <div><h4>Plain JSON library</h4><p>Saved in one folder, written in one step so a crash can't leave half a file.</p></div>
+      </div>
+    </section>
+
+    <section class="download" id="download">
+      <h2>Download</h2>
+      <p class="meta" id="download-meta">Latest release on GitHub</p>
+      <div class="cards">
+        <a class="card" data-os="windows" href="https://github.com/TariqMK/Asset-Manager/releases/latest">
+          <h3>Windows</h3>
+          <p class="cat" data-size>ZIP · Windows 10 / 11 · x64</p>
+          <p>Unzip and run <code>AssetManager.exe</code>. Keep the folder together. The app isn't code-signed, so SmartScreen may warn the first time: choose <b>More info</b>, then <b>Run anyway</b>.</p>
+        </a>
+        <a class="card" data-os="macos" href="https://github.com/TariqMK/Asset-Manager/releases/latest">
+          <h3>macOS</h3>
+          <p class="cat" data-size>ZIP · Apple Silicon</p>
+          <p>Unzip and open <code>AssetManager.app</code>. It isn't signed yet, so the first time, right-click it and choose <b>Open</b>.</p>
+        </a>
+        <a class="card" data-os="linux" href="https://github.com/TariqMK/Asset-Manager/releases/latest">
+          <h3>Linux</h3>
+          <p class="cat" data-size>TAR.GZ · x64</p>
+          <p>Extract and run <code>AssetManager/AssetManager</code>. Keep the folder together: your library is saved next to the app.</p>
+        </a>
+      </div>
+      <p class="fine">Prefer to build it yourself? Python 3.10 or newer runs it from source. See the <a href="https://github.com/TariqMK/Asset-Manager#for-developers">README</a>.</p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <span class="nav-brand"><img src="icon.svg" alt="" width="24" height="24">Asset Manager</span>
+      <p>Reads your images to make previews. Never changes them.</p>
+      <nav aria-label="Project links">
+        <a href="https://github.com/TariqMK/Asset-Manager">GitHub</a>
+        <a href="https://github.com/TariqMK/Asset-Manager/releases">Releases</a>
+        <a href="https://github.com/TariqMK/Asset-Manager/issues">Issues</a>
+      </nav>
+    </div>
+  </footer>
+
+  <!-- Lucide icons (lucide.dev, ISC licence), the same set the app uses. -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-images" viewBox="0 0 24 24"><path d="M18 22H4a2 2 0 0 1-2-2V6"/><path d="m22 13-1.296-1.296a2.41 2.41 0 0 0-3.408 0L11 18"/><circle cx="12" cy="8" r="2"/><rect width="16" height="16" x="6" y="2" rx="2"/></symbol>
+    <symbol id="i-image-off" viewBox="0 0 24 24"><line x1="2" x2="22" y1="2" y2="22"/><path d="M10.41 10.41a2 2 0 1 1-2.83-2.83"/><line x1="13.5" x2="6" y1="13.5" y2="21"/><line x1="18" x2="21" y1="12" y2="15"/><path d="M3.59 3.59A1.99 1.99 0 0 0 3 5v14a2 2 0 0 0 2 2h14c.55 0 1.052-.22 1.41-.59"/><path d="M21 15V5a2 2 0 0 0-2-2H9"/></symbol>
+    <symbol id="i-tag" viewBox="0 0 24 24"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5"/></symbol>
+    <symbol id="i-folder" viewBox="0 0 24 24"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></symbol>
+    <symbol id="i-filter" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></symbol>
+  </svg>
+  <script src="app.js"></script>
+</body>
+</html>
