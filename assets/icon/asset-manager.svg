@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <!-- Asset Manager icon master: a brass tag laid across a grid of thumbnails.
+       Colours come from static/css/style.css (surface, raised, accent). -->
+  <rect x="32" y="32" width="960" height="960" rx="216" fill="#19191b"/>
+  <rect x="36" y="36" width="952" height="952" rx="212" fill="none" stroke="#ededed" stroke-opacity="0.14" stroke-width="8"/>
+  <rect x="212" y="212" width="280" height="280" rx="40" fill="#3a3a3e"/>
+  <rect x="532" y="212" width="280" height="280" rx="40" fill="#3a3a3e"/>
+  <rect x="212" y="532" width="280" height="280" rx="40" fill="#3a3a3e"/>
+  <rect x="532" y="532" width="280" height="280" rx="40" fill="#3a3a3e"/>
+  <g transform="rotate(-20 512 512)">
+    <path d="M400 300 h170 l120 120 v260 a36 36 0 0 1 -36 36 h-254 a36 36 0 0 1 -36 -36 v-344 a36 36 0 0 1 36 -36z"
+          fill="none" stroke="#19191b" stroke-width="28" stroke-linejoin="round"/>
+    <path d="M400 300 h170 l120 120 v260 a36 36 0 0 1 -36 36 h-254 a36 36 0 0 1 -36 -36 v-344 a36 36 0 0 1 36 -36z"
+          fill="#c9a96e"/>
+    <circle cx="560" cy="400" r="34" fill="#19191b"/>
+  </g>
+</svg>

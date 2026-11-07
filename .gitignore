@@ -1,3 +1,50 @@
 Meta/
 venv/
 run.bat
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Build output (build.py / PyInstaller)
+build/
+dist/
+*.spec
+
+# App data created when running from source
+library_data/
+
+# OS clutter
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# AI tools
+.claude/
+CLAUDE.md
+CLAUDE.local.md
+AGENTS.md
+.agents/
+.codex/
+.gemini/
+GEMINI.md
+.cursor/
+.cursorrules
+.cursorignore
+.windsurf/
+.windsurfrules
+.codeium/
+.continue/
+.aider*
+.clinerules
+.cline/
+.roo/
+.roomodes
+.kiro/
+.junie/
+.amazonq/
+.specstory/
+.github/copilot-instructions.md
+.github/instructions/
+.github/prompts/
+.mcp.json

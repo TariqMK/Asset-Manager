@@ -26,6 +26,10 @@ import sys
 
 import PyInstaller.__main__
 
+# Absolute paths, because PyInstaller resolves --icon relative to the spec
+# file's folder, not the current folder.
+ICON_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "icon")
+
 args = [
     "app.py",
     "--name=AssetManager",
@@ -37,15 +41,25 @@ args = [
 
 # pywebview picks its GUI backend at runtime, so PyInstaller's analyzer
 # can miss it. Name the one each platform uses explicitly.
+# The icon: Windows embeds the .ico in the exe (the window and taskbar use
+# it too), macOS puts the .icns in the app bundle, and Linux executables
+# have no file icon, so the PNG is bundled for the window icon instead.
 if sys.platform == "win32":
-    args.append("--hidden-import=webview.platforms.winforms")
+    args += [
+        "--hidden-import=webview.platforms.winforms",
+        f"--icon={os.path.join(ICON_DIR, 'asset-manager.ico')}",
+    ]
 elif sys.platform == "darwin":
     args += [
         "--hidden-import=webview.platforms.cocoa",
         "--osx-bundle-identifier=com.tariqmk.assetmanager",
+        f"--icon={os.path.join(ICON_DIR, 'asset-manager.icns')}",
     ]
 else:
-    args.append("--hidden-import=webview.platforms.qt")
+    args += [
+        "--hidden-import=webview.platforms.qt",
+        f"--add-data={os.path.join(ICON_DIR, 'asset-manager.png')}{os.pathsep}assets/icon",
+    ]
 
 VERSION_FILE = os.path.join("backend", "version.py")
 

@@ -465,6 +465,11 @@ input[type="checkbox"] { accent-color: var(--accent); width: 16px; height: 16px;
   flex-direction: column;
 }
 
+/* When the panel is taller than the window it scrolls; its sections must
+   never shrink to fit instead. Without this, a section with overflow:hidden
+   (the .catalogue meta line) gets squeezed to part or none of its height. */
+#inspector > * { flex-shrink: 0; }
+
 .inspector-head {
   display: flex;
   align-items: center;

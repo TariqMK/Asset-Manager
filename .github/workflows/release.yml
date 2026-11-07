@@ -117,6 +117,16 @@ jobs:
       - name: Build
         run: python build.py
 
+      - name: Check the macOS app has its icon
+        if: runner.os == 'macOS'
+        run: |
+          # Without --icon PyInstaller adds its own default icon, so look
+          # for ours by name.
+          if [ ! -f dist/AssetManager.app/Contents/Resources/asset-manager.icns ]; then
+            echo "::error::AssetManager.app does not contain asset-manager.icns"
+            exit 1
+          fi
+
       - name: Package
         run: |
           mkdir -p out

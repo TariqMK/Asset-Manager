@@ -292,4 +292,7 @@ if __name__ == "__main__":
         min_size=(1000, 640),
         background_color="#161616",
     )
-    webview.start()
+    # Used by the Linux (Qt) window only. Windows takes the icon from the
+    # exe and macOS from the app bundle, so build.py ships it on Linux only.
+    icon = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "icon", "asset-manager.png")
+    webview.start(icon=icon if os.path.isfile(icon) else None)

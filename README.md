@@ -1,8 +1,12 @@
-# Asset Manager
+![Asset Manager. Tag, sort and find images. Files untouched.](assets/banner.png)
 
 A desktop app for organising your image and design-asset folders with **tags, notes and collections**, without ever moving, renaming or modifying your original files.
 
 Point it at the folders you already use and it builds a browsable, searchable library on top of them. Everything it knows about your files lives in its own data folder, so your source folders stay exactly as they are.
+
+<picture>
+  <img src="assets/screenshots/library-dark.png" alt="Asset Manager showing all files: the sidebar with tags, watched folders and collections, a grid of image thumbnails, and the details panel for a landscape photo with its tags, collections and a note" width="840">
+</picture>
 
 ## Download and install
 
@@ -39,6 +43,20 @@ Get the latest build from the [Releases page](https://github.com/TariqMK/Asset-M
 Nothing on disk is moved or changed at any point. Asset Manager only reads your images to make previews.
 
 **Supported formats:** PNG, JPG/JPEG, GIF, WebP, BMP, TIFF and SVG. SVG files are listed and taggable but show a placeholder instead of a preview.
+
+## Screenshots
+
+A smart collection. It collects every landscape tagged *sunrise* or *sunset*, and updates as you tag.
+
+<picture>
+  <img src="assets/screenshots/smart-collections-dark.png" alt="The Golden hour smart collection, showing five sunrise and sunset landscapes chosen by tag rules" width="840">
+</picture>
+
+The **Missing** view. A file that was moved outside the app keeps its tags and notes, and **Relink…** points it at the new location.
+
+<picture>
+  <img src="assets/screenshots/missing-files-dark.png" alt="The Missing view with one file marked Missing, and the details panel showing a warning banner and the Relink button" width="840">
+</picture>
 
 ## Features
 
@@ -168,6 +186,30 @@ python build.py
 ```
 
 The build goes to `dist/AssetManager/` on Windows and Linux, or `dist/AssetManager.app` on macOS. Every build is stamped with a version: set the `VERSION` environment variable to choose it, otherwise it comes from `git describe`, for example `0.3.0-2-g1a2b3c4` for two commits after the `v0.3.0` tag.
+
+### Update the screenshots
+
+The README screenshots come from the real app, filled with made-up sample images in a temporary folder. Your own `library_data` is not read or changed. Retake them after any change to the interface:
+
+```bash
+pip install -r requirements.txt PySide6
+```
+
+```bash
+python assets/make_screenshots.py
+```
+
+The script stops without saving if a section of the details panel is squeezed, or if your user name, computer name or a real path shows on the page.
+
+### Update the icon, banner and social card
+
+All brand images come from the icon masters in `assets/icon/`. To rebuild the `.png`, `.ico` and `.icns` icons, `assets/banner.png` and `assets/social-card.png`, run this on Windows. It needs PySide6 and Pillow, installed in the step above:
+
+```bash
+python assets/make_assets.py
+```
+
+**Note:** The social card is a repository setting. To change it on GitHub, open **Settings**, then under **General** go to **Social preview** and upload `assets/social-card.png`.
 
 ### Releasing
 
