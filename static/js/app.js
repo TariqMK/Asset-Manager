@@ -936,6 +936,82 @@ function formatBytes(bytes) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+// ------------------------------------------------------------------ update check
+// Runs only when the user selects the version number. The result is never
+// stored; the "newer release" tint lasts until the app closes.
+
+async function checkForUpdates() {
+  const btn = document.getElementById("btn-version");
+  if (btn.disabled) return;
+  const label = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "checking…";
+  let result = null;
+  let error = null;
+  try {
+    result = await api("/api/update-check");
+  } catch (e) {
+    error = e.message;
+  } finally {
+    btn.textContent = label;
+    btn.disabled = false;
+  }
+  if (result && result.status === "newer") {
+    btn.classList.add("update-available");
+    btn.title = `${result.latest} is available. Click for details.`;
+  }
+  showUpdateModal(result, error);
+}
+
+function showUpdateModal(result, error) {
+  let headline;
+  let detail;
+  let offerPage = false;
+  if (error) {
+    headline = "The update check didn't complete.";
+    detail = error;
+  } else if (result.status === "newer") {
+    headline = `Asset Manager ${result.latest} is available.`;
+    detail = `You have ${result.current}. Open the release page to download the new version.`;
+    offerPage = true;
+  } else if (result.status === "dev") {
+    headline = "This is a development build.";
+    detail = `You are running ${result.current}. The latest release is ${result.latest}.`;
+    offerPage = true;
+  } else {
+    headline = "Asset Manager is up to date.";
+    detail = `${result.current} is the latest release.`;
+  }
+  const notes = offerPage && result.notes ? result.notes.trim() : "";
+
+  return new Promise((resolve) => {
+    const close = () => { backdrop.remove(); document.getElementById("btn-version").focus(); resolve(); };
+    const openPage = () => {
+      api("/api/open-release", { method: "POST", body: JSON.stringify({ url: result.url }) })
+        .catch((e) => toast(e.message, { error: true }));
+      close();
+    };
+    const backdrop = mountModal(`
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="update-title" style="width:440px;">
+        <h3 id="update-title">Check for updates</h3>
+        <div class="update-headline"></div>
+        <div class="modal-text update-detail"></div>
+        ${notes ? '<details class="update-notes"><summary>Release notes</summary><pre></pre></details>' : ""}
+        <div class="modal-actions">
+          <button id="modal-cancel" type="button">Close</button>
+          ${offerPage ? '<button class="primary" id="modal-confirm" type="button">Open release page</button>' : ""}
+        </div>
+      </div>`, { onCancel: close, onConfirm: offerPage ? openPage : close });
+    backdrop.querySelector(".update-headline").textContent = headline;
+    backdrop.querySelector(".update-detail").textContent = detail;
+    if (notes) backdrop.querySelector(".update-notes pre").textContent = notes;
+    backdrop.querySelector("#modal-cancel").onclick = close;
+    const confirmBtn = backdrop.querySelector("#modal-confirm");
+    if (confirmBtn) confirmBtn.onclick = openPage;
+    (confirmBtn || backdrop.querySelector("#modal-cancel")).focus();
+  });
+}
+
 // ------------------------------------------------------------------ boot
 
 function setupStaticEventListeners() {
@@ -957,6 +1033,7 @@ function setupStaticEventListeners() {
   });
   document.getElementById("btn-import").onclick = importFilesFlow;
   document.getElementById("btn-rescan").onclick = rescanAll;
+  document.getElementById("btn-version").onclick = checkForUpdates;
   document.getElementById("btn-close-inspector").onclick = closeInspector;
 
   document.getElementById("search").addEventListener("input", debounce((e) => {

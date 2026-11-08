@@ -170,7 +170,47 @@ input[type="checkbox"] { accent-color: var(--accent); width: 16px; height: 16px;
   flex-shrink: 0;
 }
 .brand-name { font-size: 14px; font-weight: 500; }
-.brand-version { font-family: var(--mono); font-size: 11px; color: var(--text-3); }
+/* Last in the sidebar DOM (tab order), first on screen. */
+#sidebar > .brand { order: -1; }
+
+/* The version is also the "Check for updates" button: it looks like the
+   muted label at rest and only shows it is clickable on hover/focus. */
+button.brand-version {
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--text-3);
+  background: transparent;
+  border: 0;
+  border-radius: var(--r-sm);
+  box-shadow: none;
+  height: auto;
+  padding: 0 4px;
+  margin-left: -4px;
+}
+button.brand-version:hover { background: var(--raised); color: var(--text-2); }
+button.brand-version:active { transform: none; }
+button.brand-version:disabled { cursor: default; }
+button.brand-version.update-available { color: var(--accent); }
+
+.update-headline { font-size: 14px; line-height: 20px; color: var(--text); margin-top: -8px; }
+.update-detail { margin-top: -12px; }
+.update-notes summary { cursor: pointer; color: var(--text-2); font-size: 12px; line-height: 16px; }
+.update-notes pre {
+  font-family: var(--font);
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--text-2);
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 200px;
+  overflow-y: auto;
+  margin: 8px 0 0;
+  padding: 8px 12px;
+  background: var(--bg-deep);
+  border-radius: var(--r);
+  user-select: text;
+}
 
 .sidebar-section { margin-top: 20px; }
 .sidebar-section:first-of-type { margin-top: 4px; }

@@ -4,6 +4,8 @@ A desktop app for organising your image and design-asset folders with **tags, no
 
 Point it at the folders you already use and it builds a browsable, searchable library on top of them. Everything it knows about your files lives in its own data folder, so your source folders stay exactly as they are.
 
+Works offline. No account, no telemetry. The app connects to the internet only when you check for updates.
+
 <picture>
   <img src="assets/screenshots/library-dark.png" alt="Asset Manager showing all files: the sidebar with tags, watched folders and collections, a grid of image thumbnails, and the details panel for a landscape photo with its tags, collections and a note" width="840">
 </picture>
@@ -87,6 +89,7 @@ The **Missing** view. A file that was moved outside the app keeps its tags and n
 | Find files that have moved | Open **Missing** in the sidebar, select a file and click **Relink…** |
 | Stop tracking a file | Click **Remove from library** in the details panel. The file itself is untouched |
 | Close the details panel | Click **×** or press **Esc** |
+| Check for updates | Click the version number next to *Asset Manager* at the top of the sidebar |
 
 ## Where your library is stored
 
@@ -116,6 +119,24 @@ It's all plain JSON, and every save is written in one step, so a crash or power 
 
 The version you're running is shown in the window title and next to the app name in the sidebar.
 
+### Check for updates
+
+The app never checks for updates by itself. To check:
+
+1. Click the version number next to *Asset Manager* at the top of the sidebar. It shows *checking…* while it waits.
+2. Read the result in the **Check for updates** dialog.
+3. If a newer version is available, click **Open release page**. The release page opens in your browser.
+4. Download the new version and follow the steps above.
+
+**Note:** After a newer version is found, the version number turns gold until you close the app.
+
+## Privacy
+
+- **Works offline.** Every feature except **Check for updates** works with no internet connection.
+- **No tracking.** There is no telemetry, analytics, crash reporting or account.
+- **Your data stays on your computer.** Tags, notes, collections and previews are stored in `library_data` (see [Where your library is stored](#where-your-library-is-stored)). Your images are only read, never uploaded.
+- **One network connection, only when you ask.** When you select the version number, the app asks GitHub (api.github.com) for the latest release. It sends nothing else and nothing is downloaded.
+
 ## Troubleshooting
 
 **Windows: the app shows an error mentioning `Python.Runtime.Loader.Initialize` and doesn't open.**
@@ -132,6 +153,9 @@ Install the [Microsoft Edge WebView2 runtime](https://developer.microsoft.com/mi
 
 **A watched folder shows as *offline*.**
 The drive or network share isn't connected. Its files keep their tags and aren't marked missing. Reconnect it and click rescan.
+
+**Check for updates says it can't reach GitHub, or that GitHub limits how often it can be checked.**
+The computer is offline, or GitHub allows only a limited number of checks per hour from one network. Check the internet connection, or try again in an hour. You can also open the [Releases page](https://github.com/TariqMK/Asset-Manager/releases) directly.
 
 **Dragging files onto the window doesn't import them.**
 Use **Import files** instead, which always works.
@@ -171,7 +195,15 @@ pip install -r requirements.txt
 python app.py
 ```
 
-When run from source, the library is kept in `library_data` next to `app.py` and the version shows as `dev`.
+When run from source, the library is kept in `library_data` next to `app.py` and the version shows as `dev`. **Check for updates** then reports a development build.
+
+### Run the tests
+
+The tests use only the standard library and make no network requests:
+
+```bash
+python -m unittest discover -s tests
+```
 
 ### Build it yourself
 

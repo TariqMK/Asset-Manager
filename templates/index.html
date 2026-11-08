@@ -8,11 +8,6 @@
 <body>
   <div id="app">
     <aside id="sidebar" aria-label="Library">
-      <div class="brand">
-        <span class="brand-name">Asset Manager</span>
-        <span class="brand-version">{{ version }}</span>
-      </div>
-
       <nav class="sidebar-section">
         <ul class="nav-list">
           <li class="nav-item active" data-view="all" data-type="smart">
@@ -56,6 +51,16 @@
         </div>
         <ul class="nav-list collections-tree" id="collections-tree"></ul>
       </section>
+
+      <!-- Last in the DOM so the version button comes after the library in
+           the tab order; CSS (order: -1) still shows it at the top. -->
+      <div class="brand">
+        <span class="brand-name">Asset Manager</span>
+        <button class="brand-version" id="btn-version" type="button"
+                title="Check for updates" aria-label="Version {{ version }}"
+                aria-describedby="version-desc">{{ version }}</button>
+        <span id="version-desc" hidden>Check GitHub for a newer release.</span>
+      </div>
     </aside>
 
     <main id="main">

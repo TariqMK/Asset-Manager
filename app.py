@@ -8,13 +8,14 @@ Packaged into a .exe with PyInstaller -- see build.py.
 import os
 import sys
 import threading
+import webbrowser
 
 from flask import Flask, jsonify, request, send_file, render_template
 
 import webview
 
-from backend import config, library, scan_jobs, collections as collections_backend
-from backend.version import display_version
+from backend import config, library, scan_jobs, update_check, collections as collections_backend
+from backend.version import __version__, display_version
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
 
@@ -253,6 +254,28 @@ def remove_file_from_collection(collection_id, file_id):
     if node is None:
         return jsonify({"error": "Not found"}), 404
     return jsonify(node)
+
+
+# ---------------------------------------------------------------- updates
+
+@app.route("/api/update-check", methods=["GET"])
+def check_for_updates():
+    # Runs only when the user selects the version number. Flask serves each
+    # request on its own thread, so the 10 s timeout never blocks the UI.
+    try:
+        return jsonify(update_check.check(__version__))
+    except update_check.UpdateCheckError as e:
+        return jsonify({"error": str(e)}), 502
+
+
+@app.route("/api/open-release", methods=["POST"])
+def open_release():
+    url = (request.get_json(force=True) or {}).get("url")
+    # Only GitHub release pages for this app; anything else opens the list.
+    if not (isinstance(url, str) and url.startswith(f"https://github.com/{update_check.REPO}/")):
+        url = update_check.RELEASES_PAGE
+    webbrowser.open(url)
+    return jsonify({"ok": True})
 
 
 # ---------------------------------------------------------------- boot
